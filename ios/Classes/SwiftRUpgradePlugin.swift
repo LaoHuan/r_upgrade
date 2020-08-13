@@ -72,8 +72,14 @@ public class SwiftRUpgradePlugin: NSObject, FlutterPlugin {
         let appUrl = "https://itunes.apple.com/lookup?id=" + appId
         do{
             let jsonData = NSData(contentsOf: NSURL(string: appUrl)! as URL)
-            let json = try JSONSerialization.jsonObject(with: jsonData! as Data, options: JSONSerialization.ReadingOptions.mutableLeaves) as! NSDictionary
-            return json;
+            if(jsonData==nil){
+                return nil;
+            }
+            let json = try JSONSerialization.jsonObject(with: jsonData! as Data, options: JSONSerialization.ReadingOptions.mutableLeaves)
+            if(json!=nil){
+                return (json as! NSDictionary)
+            }
+            return nil;
         }catch{
             NSLog("获取appId:%@ 对应的appStore信息失败",appId)
         }
