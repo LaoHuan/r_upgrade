@@ -56,30 +56,32 @@ public class SwiftRUpgradePlugin: NSObject, FlutterPlugin {
     
     //跳转到应用的AppStore页页面
     func upgradeFromAppStore(appId: String, result: @escaping FlutterResult) {
-        let dict = getInfoFromAppStore(appId: appId);
-        if((dict) != nil){
-            let res = dict!["results"] as! NSArray
-            let xx = res[0] as! NSDictionary
-            let urlString = xx["trackViewUrl"] as! String
-            result(openUrl(url: urlString))
-        }else{
-            result(false)
+        DispatchQueue.global(qos: .utility).async {
+            let dict = self.getInfoFromAppStore(appId: appId);
+            if((dict) != nil){
+                let res = dict!["results"] as! NSArray
+                let xx = res[0] as! NSDictionary
+                let urlString = xx["trackViewUrl"] as! String
+                result(self.openUrl(url: urlString))
+            }else{
+                result(false)
+            }
         }
     }
     
     //获取应用信息
     func getInfoFromAppStore(appId:String) -> NSDictionary? {
-        let appUrl = "https://itunes.apple.com/lookup?id=" + appId
+        let appUrl = URL.init(string: "http://itunes.apple.com/lookup?id=" + appId)
+        guard let appMsg = try? String.init(contentsOf: appUrl!, encoding: .utf8) else{
+            return nil;
+        }
         do{
-            let jsonData = NSData(contentsOf: NSURL(string: appUrl)! as URL)
-            if(jsonData==nil){
+            let jsonData:Data? = appMsg.data(using: .utf8)
+            if(jsonData == nil){
                 return nil;
             }
-            let json = try JSONSerialization.jsonObject(with: jsonData! as Data, options: JSONSerialization.ReadingOptions.mutableLeaves)
-            if(json != nil){
-                return (json as! NSDictionary)
-            }
-            return nil;
+            let json = try JSONSerialization.jsonObject(with: jsonData!, options: .mutableContainers)
+            return (json as! NSDictionary)
         }catch{
             NSLog("获取appId:%@ 对应的appStore信息失败",appId)
         }
