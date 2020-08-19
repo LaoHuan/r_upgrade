@@ -87,13 +87,15 @@ public class SwiftRUpgradePlugin: NSObject, FlutterPlugin {
     }
     
     func getVersionFromAppStore(appId:String,result: @escaping FlutterResult){
-        let dict = getInfoFromAppStore(appId: appId)
-        if((dict) != nil){
-            let res = dict!["results"] as! NSArray
-            let xx = res[0] as! NSDictionary
-            result(xx["version"]! as! String)
-        }else{
-            result(nil)
+        DispatchQueue.global(qos: .utility).async {
+            let dict = getInfoFromAppStore(appId: appId)
+            if((dict) != nil){
+                let res = dict!["results"] as! NSArray
+                let xx = res[0] as! NSDictionary
+                result(xx["version"]! as! String)
+            }else{
+                result(nil)
+            }
         }
     }
 }
