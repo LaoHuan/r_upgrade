@@ -76,7 +76,7 @@ public class SwiftRUpgradePlugin: NSObject, FlutterPlugin {
                 return nil;
             }
             let json = try JSONSerialization.jsonObject(with: jsonData! as Data, options: JSONSerialization.ReadingOptions.mutableLeaves)
-            if(json!=nil){
+            if(json != nil){
                 return (json as! NSDictionary)
             }
             return nil;
