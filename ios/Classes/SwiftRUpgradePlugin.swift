@@ -44,10 +44,12 @@ public class SwiftRUpgradePlugin: NSObject, FlutterPlugin {
     func openUrl(url:String) ->Bool{
         if let url = URL(string: url) {
             //根据iOS系统版本，分别处理
-            if #available(iOS 10, *) {
-                UIApplication.shared.open(url, options: [:],completionHandler: {(success) in })
-            } else {
-                UIApplication.shared.openURL(url)
+            DispatchQueue.main.async {
+                if #available(iOS 10, *) {
+                    UIApplication.shared.open(url, options: [:],completionHandler: {(success) in })
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
             }
             return true;
         }
@@ -56,17 +58,20 @@ public class SwiftRUpgradePlugin: NSObject, FlutterPlugin {
     
     //跳转到应用的AppStore页页面
     func upgradeFromAppStore(appId: String, result: @escaping FlutterResult) {
-        DispatchQueue.global(qos: .utility).async {
-            let dict = self.getInfoFromAppStore(appId: appId);
-            if((dict) != nil){
-                let res = dict!["results"] as! NSArray
-                let xx = res[0] as! NSDictionary
-                let urlString = xx["trackViewUrl"] as! String
-                result(self.openUrl(url: urlString))
-            }else{
-                result(false)
-            }
-        }
+        result(openUrl(url: "http://itunes.apple.com/app/id" + appId))
+//        let updateUrl:URL = URL.init(string: )!
+//
+//        DispatchQueue.global(qos: .utility).async {
+//            let dict = self.getInfoFromAppStore(appId: appId);
+//            if((dict) != nil){
+//                let res = dict!["results"] as! NSArray
+//                let xx = res[0] as! NSDictionary
+//                let urlString = xx["trackViewUrl"] as! String
+//                result(self.openUrl(url: urlString))
+//            }else{
+//                result(false)
+//            }
+//        }
     }
     
     //获取应用信息
